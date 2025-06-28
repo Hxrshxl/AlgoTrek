@@ -31,14 +31,14 @@ export async function GET() {
       blobUrl: company.blob_url,
       fileName: company.file_name,
       lastUpdated: company.last_updated,
-      difficulties: (company.company_difficulties || []).map((d) => ({
+      difficulties: (company.company_difficulties || []).map((d: any) => ({
         level: d.difficulty,
         count: d.count,
       })),
       topTopics: (company.company_topics || [])
-        .sort((a, b) => a.rank - b.rank)
+        .sort((a: any, b: any) => a.rank - b.rank)
         .slice(0, 5)
-        .map((t) => t.topic),
+        .map((t: any) => t.topic),
     }))
 
     return NextResponse.json(formattedCompanies)

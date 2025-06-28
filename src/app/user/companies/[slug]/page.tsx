@@ -5,9 +5,9 @@ import QuestionsTable from "@/components/company/questions-table"
 import CompanyStats from "@/components/company/company-stats"
 
 interface CompanyPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 async function getCompanyData(slug: string) {
@@ -83,10 +83,11 @@ async function getCompanyData(slug: string) {
 }
 
 export default async function CompanyPage({ params }: CompanyPageProps) {
-  const company = await getCompanyData(params.slug)
+  const { slug } = await params
+  const company = await getCompanyData(slug)
 
   if (!company) {
-    console.log(`Company not found, showing 404 for slug: ${params.slug}`)
+    console.log(`Company not found, showing 404 for slug: ${slug}`)
     notFound()
   }
 
@@ -108,7 +109,8 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
 }
 
 export async function generateMetadata({ params }: CompanyPageProps) {
-  const company = await getCompanyData(params.slug)
+  const { slug } = await params
+  const company = await getCompanyData(slug)
 
   if (!company) {
     return {

@@ -7,11 +7,7 @@ interface ProcessedCompanyData {
   questions: QuestionData[]
 }
 
-export async function processCompanyFile(
-  csvContent: string,
-  _companyName: string, // unused for now, prefixed to avoid ESLint error
-  _slug: string         // unused for now, prefixed to avoid ESLint error
-): Promise<ProcessedCompanyData> {
+export async function processCompanyFile(csvContent: string): Promise<ProcessedCompanyData> {
   const questions = parseCSV(csvContent)
 
   const difficulties: DifficultyCount[] = [

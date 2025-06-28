@@ -1,3 +1,5 @@
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+
 export interface Database {
   public: {
     Tables: {
@@ -6,129 +8,68 @@ export interface Database {
           id: string
           name: string
           slug: string
-          total_questions: number
-          blob_url: string | null
-          file_name: string | null
-          category: string
-          is_active: boolean
-          last_updated: string
-          created_at: string
+          total_questions: number | null
         }
         Insert: {
           id?: string
           name: string
           slug: string
-          total_questions?: number
-          blob_url?: string | null
-          file_name?: string | null
-          category?: string
-          is_active?: boolean
-          last_updated?: string
-          created_at?: string
+          total_questions?: number | null
         }
         Update: {
           id?: string
           name?: string
           slug?: string
-          total_questions?: number
-          blob_url?: string | null
-          file_name?: string | null
-          category?: string
-          is_active?: boolean
-          last_updated?: string
-          created_at?: string
+          total_questions?: number | null
         }
-      }
-      company_difficulties: {
-        Row: {
-          id: string
-          company_id: string
-          difficulty: "Easy" | "Medium" | "Hard"
-          count: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          company_id: string
-          difficulty: "Easy" | "Medium" | "Hard"
-          count: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          company_id?: string
-          difficulty?: "Easy" | "Medium" | "Hard"
-          count?: number
-          created_at?: string
-        }
-      }
-      company_topics: {
-        Row: {
-          id: string
-          company_id: string
-          topic: string
-          count: number
-          rank: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          company_id: string
-          topic: string
-          count: number
-          rank?: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          company_id?: string
-          topic?: string
-          count?: number
-          rank?: number
-          created_at?: string
-        }
+        Relationships: []
       }
       questions: {
         Row: {
-          id: string
           company_id: string
-          question_id: string
-          title: string
-          url: string | null
-          is_premium: boolean
-          acceptance: string | null
-          difficulty: "Easy" | "Medium" | "Hard" | null
-          frequency: string | null
+          difficulty: string | null
+          id: string
+          leetcode_url: string | null
+          title: string | null
           topics: string[] | null
-          created_at: string
         }
         Insert: {
-          id?: string
           company_id: string
-          question_id: string
-          title: string
-          url?: string | null
-          is_premium?: boolean
-          acceptance?: string | null
-          difficulty?: "Easy" | "Medium" | "Hard" | null
-          frequency?: string | null
+          difficulty?: string | null
+          id?: string
+          leetcode_url?: string | null
+          title?: string | null
           topics?: string[] | null
-          created_at?: string
         }
         Update: {
-          id?: string
           company_id?: string
-          question_id?: string
-          title?: string
-          url?: string | null
-          is_premium?: boolean
-          acceptance?: string | null
-          difficulty?: "Easy" | "Medium" | "Hard" | null
-          frequency?: string | null
+          difficulty?: string | null
+          id?: string
+          leetcode_url?: string | null
+          title?: string | null
           topics?: string[] | null
-          created_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "questions_company_id_fkey"
+            columns: ["company_id"]
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }

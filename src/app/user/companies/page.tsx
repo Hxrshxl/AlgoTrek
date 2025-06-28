@@ -1,7 +1,8 @@
 import { Suspense } from "react"
-import CompaniesHeader from "@/components/companies/companies-header"
-import CompaniesList from "@/components/companies/companies-list"
 import CompaniesLoading from "@/components/companies/companies-loading"
+
+import { CompaniesList } from "@/components/companies/companies-list"
+import { CompaniesHeader } from "@/components/companies/companies-header"
 
 export default function CompaniesPage() {
   return (

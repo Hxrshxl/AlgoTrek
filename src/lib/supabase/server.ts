@@ -21,3 +21,7 @@ export const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseService
     persistSession: false,
   },
 })
+
+export function createServerClient() {
+  return supabaseAdmin
+}

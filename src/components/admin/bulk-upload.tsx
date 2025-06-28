@@ -64,7 +64,6 @@ export default function BulkUpload() {
         formData.append("files", file)
       })
 
-      // Start upload
       const response = await fetch("/api/companies/bulk-upload", {
         method: "POST",
         body: formData,
@@ -119,8 +118,7 @@ export default function BulkUpload() {
             <input
               ref={(el) => {
                 if (el) {
-                  // @ts-expect-error - webkitdirectory is not in the standard HTMLInputElement type
-                  el.webkitdirectory = true
+                  (el as HTMLInputElement & { webkitdirectory?: boolean }).webkitdirectory = true
                   fileInputRef.current = el
                 }
               }}
@@ -236,7 +234,7 @@ export default function BulkUpload() {
                       <details className="mt-2">
                         <summary className="cursor-pointer font-medium">View Failed Files</summary>
                         <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
-                          {result.results.failed.map((failure: { fileName: string; error: string }, index: number) => (
+                          {result.results.failed.map((failure, index) => (
                             <div key={index} className="text-xs bg-red-100 p-2 rounded">
                               <strong>{failure.fileName}:</strong> {failure.error}
                             </div>
@@ -249,13 +247,11 @@ export default function BulkUpload() {
                       <details className="mt-2">
                         <summary className="cursor-pointer font-medium">View Successful Uploads</summary>
                         <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
-                          {result.results.successful
-                            .slice(0, 10)
-                            .map((success: { companyName: string; totalQuestions: number }, index: number) => (
-                              <div key={index} className="text-xs bg-green-100 p-2 rounded">
-                                <strong>{success.companyName}:</strong> {success.totalQuestions} questions
-                              </div>
-                            ))}
+                          {result.results.successful.slice(0, 10).map((success, index) => (
+                            <div key={index} className="text-xs bg-green-100 p-2 rounded">
+                              <strong>{success.companyName}:</strong> {success.totalQuestions} questions
+                            </div>
+                          ))}
                           {result.results.successful.length > 10 && (
                             <div className="text-xs text-center py-1">
                               ... and {result.results.successful.length - 10} more

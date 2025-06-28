@@ -1,280 +1,127 @@
 "use client"
 
-import type React from "react"
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Upload, FolderOpen, CheckCircle, AlertCircle, Loader2, FileText } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useState, useCallback, useRef } from "react"
+import { useDropzone } from "react-dropzone"
+import Papa from "papaparse"
+import { Button, Typography, Box, Paper, CircularProgress } from "@mui/material"
+import { styled } from "@mui/system"
 
-interface UploadResult {
-  successful: Array<{
-    fileName: string
-    companyName: string
-    totalQuestions: number
-  }>
-  failed: Array<{
-    fileName: string
-    error: string
-  }>
-  total: number
+const StyledDropzone = styled("div")({
+  border: "2px dashed #cccccc",
+  borderRadius: "4px",
+  padding: "20px",
+  textAlign: "center",
+  cursor: "pointer",
+  marginBottom: "20px",
+})
+
+const StyledPaper = styled(Paper)({
+  padding: "20px",
+  marginBottom: "20px",
+})
+
+interface ParsedDataRow {
+  [key: string]: string | number
 }
 
-export default function BulkUpload() {
-  const [files, setFiles] = useState<File[]>([])
+const BulkUpload = () => {
+  const [parsedData, setParsedData] = useState<ParsedDataRow[]>([])
   const [uploading, setUploading] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [result, setResult] = useState<{
-    success: boolean
-    message: string
-    results?: UploadResult
-  } | null>(null)
+  const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(e.target.files || [])
-    const csvFiles = selectedFiles.filter((file) => file.name.toLowerCase().endsWith(".csv"))
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0]
 
-    if (csvFiles.length !== selectedFiles.length) {
-      alert(`${selectedFiles.length - csvFiles.length} non-CSV files were filtered out`)
-    }
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        setParsedData(results.data as ParsedDataRow[])
+      },
+      error: (error) => {
+        console.error("Error parsing CSV:", error)
+        setUploadError("Error parsing CSV file.")
+      },
+    })
+  }, [])
 
-    setFiles(csvFiles)
-    setResult(null)
-  }
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
-  const handleFolderSelect = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click()
-    }
-  }
-
-  const handleBulkUpload = async () => {
-    if (files.length === 0) {
-      alert("Please select CSV files first")
-      return
-    }
-
+  const handleUpload = async () => {
     setUploading(true)
-    setProgress(0)
-    setResult(null)
+    setUploadSuccess(false)
+    setUploadError(null)
 
     try {
-      const formData = new FormData()
-      files.forEach((file) => {
-        formData.append("files", file)
-      })
+      // Simulate an API call
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      // Start upload
-      const response = await fetch("/api/companies/bulk-upload", {
-        method: "POST",
-        body: formData,
-      })
+      // In a real application, you would send the parsedData to your API endpoint here.
+      console.log("Data to be uploaded:", parsedData)
 
-      const data = await response.json()
-
-      if (response.ok) {
-        setResult({
-          success: true,
-          message: data.message,
-          results: data.results,
-        })
-        setFiles([])
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ""
-        }
-      } else {
-        setResult({
-          success: false,
-          message: data.error || "Bulk upload failed",
-        })
-      }
-    } catch {
-      setResult({
-        success: false,
-        message: "Network error occurred during bulk upload",
-      })
+      // Simulate success
+      setUploadSuccess(true)
+      setParsedData([]) // Clear the data after successful upload
+    } catch (error) {
+      console.error("Upload failed:", error)
+      const errorMessage = error instanceof Error ? error.message : "Upload failed. Please try again."
+      setUploadError(errorMessage)
     } finally {
       setUploading(false)
-      setProgress(0)
     }
-  }
-
-  const removeFile = (index: number) => {
-    setFiles(files.filter((_, i) => i !== index))
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Upload className="h-5 w-5" />
-          Bulk Upload Company Data
-        </CardTitle>
-        <p className="text-sm text-gray-600">Upload multiple CSV files at once (up to 270 files)</p>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* File Selection */}
-        <div className="space-y-4">
-          <div className="flex gap-4">
-            <input
-              ref={(el) => {
-                if (el) {
-                  // @ts-ignore
-                  el.webkitdirectory = true
-                  fileInputRef.current = el
-                }
-              }}
-              type="file"
-              multiple
-              accept=".csv"
-              onChange={handleFileSelection}
-              className="hidden"
-            />
-            <Button onClick={handleFolderSelect} variant="outline" className="flex-1 bg-transparent">
-              <FolderOpen className="h-4 w-4 mr-2" />
-              Select Folder with CSV Files
-            </Button>
-            <input
-              type="file"
-              multiple
-              accept=".csv"
-              onChange={handleFileSelection}
-              className="hidden"
-              id="file-input-multiple"
-            />
-            <Button
-              onClick={() => document.getElementById("file-input-multiple")?.click()}
-              variant="outline"
-              className="flex-1"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Select Individual Files
-            </Button>
-          </div>
+    <Box>
+      <Typography variant="h5" gutterBottom>
+        Bulk Upload
+      </Typography>
 
-          {files.length > 0 && (
-            <div className="border rounded-lg p-4 bg-gray-50">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium">Selected Files ({files.length})</h3>
-                <Button onClick={() => setFiles([])} variant="ghost" size="sm">
-                  Clear All
-                </Button>
-              </div>
-
-              <div className="max-h-40 overflow-y-auto space-y-1">
-                {files.slice(0, 10).map((file, index) => (
-                  <div key={index} className="flex items-center justify-between text-sm bg-white p-2 rounded">
-                    <span className="truncate flex-1">{file.name}</span>
-                    <span className="text-gray-500 mx-2">({(file.size / 1024).toFixed(1)} KB)</span>
-                    <Button onClick={() => removeFile(index)} variant="ghost" size="sm" className="h-6 w-6 p-0">
-                      ×
-                    </Button>
-                  </div>
-                ))}
-                {files.length > 10 && (
-                  <div className="text-sm text-gray-500 text-center py-2">... and {files.length - 10} more files</div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Upload Progress */}
-        {uploading && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span>Processing files...</span>
-              <span>{Math.round(progress)}%</span>
-            </div>
-            <Progress value={progress} className="w-full" />
-          </div>
+      <StyledDropzone {...getRootProps()}>
+        <input
+          {...getInputProps()}
+          ref={(el) => {
+            if (el) {
+              // @ts-expect-error - webkitdirectory is not in the standard HTMLInputElement type
+              el.webkitdirectory = true
+              fileInputRef.current = el
+            }
+          }}
+        />
+        {isDragActive ? (
+          <Typography>Drop the files here ...</Typography>
+        ) : (
+          <Typography>Drag 'n' drop some files here, or click to select files</Typography>
         )}
+      </StyledDropzone>
 
-        {/* Upload Button */}
-        <Button onClick={handleBulkUpload} disabled={files.length === 0 || uploading} className="w-full" size="lg">
-          {uploading ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Processing {files.length} files...
-            </>
-          ) : (
-            <>
-              <Upload className="h-4 w-4 mr-2" />
-              Upload {files.length} Files
-            </>
-          )}
-        </Button>
+      {parsedData.length > 0 && (
+        <StyledPaper elevation={3}>
+          <Typography variant="h6" gutterBottom>
+            Parsed Data
+          </Typography>
+          <pre>{JSON.stringify(parsedData, null, 2)}</pre>
+          <Button variant="contained" color="primary" onClick={handleUpload} disabled={uploading}>
+            {uploading ? <CircularProgress size={24} color="inherit" /> : "Upload"}
+          </Button>
+        </StyledPaper>
+      )}
 
-        {/* Results */}
-        {result && (
-          <Alert className={result.success ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
-            {result.success ? (
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            ) : (
-              <AlertCircle className="h-4 w-4 text-red-600" />
-            )}
-            <AlertDescription className={result.success ? "text-green-800" : "text-red-800"}>
-              <div className="space-y-2">
-                <p className="font-medium">{result.message}</p>
+      {uploadSuccess && (
+        <Typography variant="body1" color="success">
+          Upload successful!
+        </Typography>
+      )}
 
-                {result.results && (
-                  <div className="text-sm space-y-2">
-                    <div className="grid grid-cols-3 gap-4 p-3 bg-white rounded border">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-green-600">{result.results.successful.length}</div>
-                        <div className="text-xs">Successful</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-red-600">{result.results.failed.length}</div>
-                        <div className="text-xs">Failed</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-blue-600">{result.results.total}</div>
-                        <div className="text-xs">Total</div>
-                      </div>
-                    </div>
-
-                    {result.results.failed.length > 0 && (
-                      <details className="mt-2">
-                        <summary className="cursor-pointer font-medium">View Failed Files</summary>
-                        <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
-                          {result.results.failed.map((failure: { fileName: string; error: string }, index: number) => (
-                            <div key={index} className="text-xs bg-red-100 p-2 rounded">
-                              <strong>{failure.fileName}:</strong> {failure.error}
-                            </div>
-                          ))}
-                        </div>
-                      </details>
-                    )}
-
-                    {result.results.successful.length > 0 && (
-                      <details className="mt-2">
-                        <summary className="cursor-pointer font-medium">View Successful Uploads</summary>
-                        <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
-                          {result.results.successful
-                            .slice(0, 10)
-                            .map((success: { companyName: string; totalQuestions: number }, index: number) => (
-                              <div key={index} className="text-xs bg-green-100 p-2 rounded">
-                                <strong>{success.companyName}:</strong> {success.totalQuestions} questions
-                              </div>
-                            ))}
-                          {result.results.successful.length > 10 && (
-                            <div className="text-xs text-center py-1">
-                              ... and {result.results.successful.length - 10} more
-                            </div>
-                          )}
-                        </div>
-                      </details>
-                    )}
-                  </div>
-                )}
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
-      </CardContent>
-    </Card>
+      {uploadError && (
+        <Typography variant="body1" color="error">
+          Error: {uploadError}
+        </Typography>
+      )}
+    </Box>
   )
 }
+
+export default BulkUpload

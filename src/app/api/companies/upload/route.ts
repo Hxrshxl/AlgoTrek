@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     console.log("File uploaded to blob:", blob.url)
 
-    // Process the file and extract data - FIXED: Only pass fileContent
+    // Process the file and extract data
     const fileContent = await file.text()
     const processedData = await processCompanyFile(fileContent)
 
@@ -67,47 +67,6 @@ export async function POST(request: NextRequest) {
 
     console.log("Company saved successfully:", company.id)
 
-    // Clear existing difficulty data for this company
-    await supabaseAdmin.from("company_difficulties").delete().eq("company_id", company.id)
-
-    // Store difficulty data
-    if (processedData.difficulties.length > 0) {
-      const difficultyData = processedData.difficulties.map((diff) => ({
-        company_id: company.id,
-        difficulty: diff.level,
-        count: diff.count,
-      }))
-
-      console.log("Inserting difficulty data:", difficultyData)
-
-      const { error: diffError } = await supabaseAdmin.from("company_difficulties").insert(difficultyData)
-
-      if (diffError) {
-        console.error("Failed to save difficulties:", diffError)
-      }
-    }
-
-    // Clear existing topic data for this company
-    await supabaseAdmin.from("company_topics").delete().eq("company_id", company.id)
-
-    // Store topic data
-    if (processedData.topTopics.length > 0) {
-      const topicData = processedData.topTopics.map((topic, index) => ({
-        company_id: company.id,
-        topic: topic.name,
-        count: topic.count,
-        rank: index + 1,
-      }))
-
-      console.log("Inserting topic data:", topicData.slice(0, 3)) // Log first 3 topics
-
-      const { error: topicsError } = await supabaseAdmin.from("company_topics").insert(topicData)
-
-      if (topicsError) {
-        console.error("Failed to save topics:", topicsError)
-      }
-    }
-
     // Clear existing questions for this company
     await supabaseAdmin.from("questions").delete().eq("company_id", company.id)
 
@@ -127,7 +86,8 @@ export async function POST(request: NextRequest) {
           company_id: company.id,
           question_id: q.id,
           title: q.title,
-          url: q.url,
+          url: q.url || q.leetcode_url,
+          leetcode_url: q.url || q.leetcode_url,
           is_premium: q.isPremium,
           acceptance: q.acceptance,
           difficulty: q.difficulty,
@@ -139,6 +99,7 @@ export async function POST(request: NextRequest) {
 
         if (questionsError) {
           console.error("Failed to save questions batch:", questionsError)
+          throw new Error(`Failed to save questions: ${JSON.stringify(questionsError)}`)
         }
       }
     }

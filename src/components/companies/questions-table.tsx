@@ -276,7 +276,7 @@ export default function QuestionsTable({ questions = [], companySlug }: Question
           {filteredQuestions.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               <Hash className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No questions found matching your filters.</p>
+              <p>No questions found matching your filter.</p>
             </div>
           )}
         </div>

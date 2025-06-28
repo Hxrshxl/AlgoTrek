@@ -84,11 +84,9 @@ const StatsSection: React.FC<StatsSectionProps> = ({ statsRef }) => {
       <motion.div variants={itemVariants}>
         <StatCard value="95%" description="Interview Success Rate" icon={<TrendingUp className="w-8 h-8" />} />
       </motion.div>
-
       <motion.div variants={itemVariants}>
         <StatCard value="2000+" description="Problems Solved Daily" icon={<BarChart2 className="w-8 h-8" />} />
       </motion.div>
-
       <motion.div variants={itemVariants}>
         <StatCard value="85%" description="Land Dream Jobs" icon={<Award className="w-8 h-8" />} />
       </motion.div>
@@ -102,7 +100,6 @@ const PlatformDemo = () => {
     <div className="relative max-w-5xl mx-auto mb-20">
       {/* Gradient background */}
       <div className="absolute inset-0 -m-10 bg-gradient-to-br from-algotrek-aqua/20 via-algotrek-pink/20 to-algotrek-aqua/20 rounded-3xl blur-3xl opacity-40"></div>
-
       <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm">
         {/* Platform UI Header - AlgoTrek Dashboard */}
         <div className="bg-white border-b border-gray-200 flex items-center px-6 py-3">
@@ -111,7 +108,6 @@ const PlatformDemo = () => {
             <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
-
           <div className="flex space-x-1 overflow-x-auto scrollbar-hide">
             <div className="px-4 py-2 text-algotrek-aqua bg-algotrek-aqua/10 rounded-t-lg font-medium text-sm border-b-2 border-algotrek-aqua">
               AI Scheduler
@@ -124,7 +120,6 @@ const PlatformDemo = () => {
             </div>
             <div className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-t-lg font-medium text-sm">Analytics</div>
           </div>
-
           <div className="ml-auto flex items-center space-x-4">
             <div className="flex items-center bg-green-50 px-3 py-1 rounded-full">
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
@@ -156,7 +151,6 @@ const PlatformDemo = () => {
                     <span className="text-xs font-medium text-algotrek-aqua">Powered by AI</span>
                   </div>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div>
                     <label className="text-sm font-medium text-gray-700 mb-2 block">Target Companies</label>
@@ -182,7 +176,6 @@ const PlatformDemo = () => {
                     <Zap className="w-4 h-4 text-algotrek-aqua mr-1" />
                     Your Personalized Schedule
                   </h4>
-
                   <div className="space-y-2">
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center">
@@ -194,7 +187,6 @@ const PlatformDemo = () => {
                       </div>
                       <div className="text-xs text-green-600 font-medium">Completed</div>
                     </div>
-
                     <div className="flex items-center justify-between p-3 bg-algotrek-aqua/5 rounded-lg border border-algotrek-aqua/20">
                       <div className="flex items-center">
                         <PlayCircle className="w-4 h-4 text-algotrek-aqua mr-3" />
@@ -205,7 +197,6 @@ const PlatformDemo = () => {
                       </div>
                       <div className="text-xs text-algotrek-aqua font-medium">In Progress (3/12)</div>
                     </div>
-
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 text-gray-400 mr-3" />
@@ -282,7 +273,7 @@ const PlatformDemo = () => {
                 </h3>
                 <div className="space-y-2">
                   <button className="w-full bg-algotrek-aqua text-algotrek-dark-blue py-2 rounded-lg text-sm font-medium">
-                    Today's Problems
+                    {"Today's Problems"}
                   </button>
                   <button className="w-full border border-algotrek-pink text-algotrek-pink py-2 rounded-lg text-sm font-medium">
                     Mock Interview
@@ -320,7 +311,7 @@ const testimonials = [
   {
     id: 1,
     quote:
-      "AlgoTrek's AI scheduler helped me land my dream job at Google. The company-specific questions were spot on!",
+      "AlgoTrek&apos;s AI scheduler helped me land my dream job at Google. The company-specific questions were spot on!",
     name: "Sarah Chen",
     title: "Software Engineer at Google",
     company: "Google",
@@ -386,7 +377,6 @@ const Testimonials = () => {
         >
           <h2 className="text-3xl font-bold mb-6">Trusted by developers at top companies</h2>
         </motion.div>
-
         <div className="grid grid-cols-12 gap-4">
           {/* Stats box */}
           <motion.div
@@ -432,7 +422,7 @@ const Testimonials = () => {
             className="col-span-12 md:col-span-8 lg:col-span-6 rounded-xl overflow-hidden"
           >
             <div className={`h-full ${testimonials[0].bgColor} p-8 flex flex-col`}>
-              <div className="text-2xl font-medium mb-8">"{testimonials[0].quote}"</div>
+              <div className="text-2xl font-medium mb-8">&ldquo;{testimonials[0].quote}&rdquo;</div>
               <div className="mt-auto">
                 <div className="font-medium">{testimonials[0].name}</div>
                 <div className="text-gray-600 text-sm">{testimonials[0].title}</div>
@@ -449,7 +439,7 @@ const Testimonials = () => {
             className="col-span-12 md:col-span-7 lg:col-span-6 rounded-xl overflow-hidden"
           >
             <div className={`h-full ${testimonials[1].bgColor} p-8 flex flex-col`}>
-              <div className="text-2xl font-medium mb-8">"{testimonials[1].quote}"</div>
+              <div className="text-2xl font-medium mb-8">&ldquo;{testimonials[1].quote}&rdquo;</div>
               <div className="mt-auto">
                 <div className="font-medium">{testimonials[1].name}</div>
                 <div className="text-gray-600 text-sm">{testimonials[1].title}</div>
@@ -479,7 +469,7 @@ const Testimonials = () => {
             className="col-span-12 md:col-span-12 lg:col-span-3 rounded-xl overflow-hidden"
           >
             <div className={`h-full ${testimonials[2].bgColor} p-8 flex flex-col`}>
-              <div className="text-2xl font-medium mb-8">"{testimonials[2].quote}"</div>
+              <div className="text-2xl font-medium mb-8">&ldquo;{testimonials[2].quote}&rdquo;</div>
               <div className="mt-auto">
                 <div className="font-medium">{testimonials[2].name}</div>
                 <div className="text-gray-600 text-sm">{testimonials[2].title}</div>
@@ -539,7 +529,6 @@ export default function AlgoTrekLanding() {
               Master Coding Interviews with <span className="text-algotrek-aqua">AI-Powered</span>{" "}
               <span className="text-algotrek-pink">Scheduling</span>
             </motion.h1>
-
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -549,7 +538,6 @@ export default function AlgoTrekLanding() {
               Get personalized study schedules, company-specific problem sets, and AI-driven insights to land your dream
               job at top tech companies.
             </motion.p>
-
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -593,7 +581,6 @@ export default function AlgoTrekLanding() {
               skill level.
             </motion.p>
           </div>
-
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -628,7 +615,6 @@ export default function AlgoTrekLanding() {
               Join thousands of developers who have successfully landed their dream jobs using AlgoTrek.
             </motion.p>
           </div>
-
           <StatsSection statsRef={statsRef} />
         </div>
       </section>

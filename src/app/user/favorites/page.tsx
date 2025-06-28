@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { FavoritesList } from "@/components/companies/favorites-list"
 import { Suspense } from "react"
 import HamsterLoader from "@/components/ui/hamster-loader"
-
+// import { HamsterLoader } from "@/components/ui/hamster-loader"
 
 export default function FavoritesPage() {
   const router = useRouter()
@@ -15,7 +15,7 @@ export default function FavoritesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Suspense fallback={<HamsterLoader message="Loading favorites..." />}>
+      <Suspense fallback={<HamsterLoader />}>
         <FavoritesList onBack={handleBack} />
       </Suspense>
     </div>

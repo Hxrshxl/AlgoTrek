@@ -5,8 +5,8 @@ export async function GET() {
   try {
     console.log("Testing database connection...")
 
-    // Test basic connection
-    const { data, error } = await supabaseAdmin.from("companies").select("count(*)").single()
+    // Test basic connection and get count
+    const { count, error } = await supabaseAdmin.from("companies").select("*", { count: "exact", head: true })
 
     if (error) {
       console.error("Database connection error:", error)
@@ -17,7 +17,7 @@ export async function GET() {
       })
     }
 
-    // Test table structure
+    // Test table structure by getting one record
     const { data: tableInfo } = await supabaseAdmin.from("companies").select("*").limit(1)
 
     console.log("Database test successful")
@@ -26,7 +26,7 @@ export async function GET() {
       success: true,
       message: "Database connection successful",
       tablesExist: true,
-      companyCount: data?.count || 0,
+      companyCount: count || 0,
       tableStructure: tableInfo || [],
     })
   } catch (error) {

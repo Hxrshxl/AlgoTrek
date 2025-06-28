@@ -16,7 +16,7 @@ interface QuestionsTableProps {
   companySlug: string
 }
 
-export default function QuestionsTable({ questions = [], companySlug }: QuestionsTableProps) {
+export function QuestionsTable({ questions = [], companySlug }: QuestionsTableProps) {
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState("")
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all")
@@ -178,7 +178,11 @@ export default function QuestionsTable({ questions = [], companySlug }: Question
           </Select>
 
           <div className="flex items-center space-x-2">
-            <Checkbox id="show-completed" checked={showCompleted} onCheckedChange={setShowCompleted} />
+            <Checkbox
+              id="show-completed"
+              checked={showCompleted}
+              onCheckedChange={(checked) => setShowCompleted(!!checked)}
+            />
             <label htmlFor="show-completed" className="text-sm font-medium">
               Show completed
             </label>
@@ -228,7 +232,11 @@ export default function QuestionsTable({ questions = [], companySlug }: Question
                         <span className={`font-medium ${isCompleted ? "line-through text-gray-500" : ""}`}>
                           {question.title || "Untitled Question"}
                         </span>
-                        {question.isPremium && <Crown className="h-4 w-4 text-yellow-500" title="Premium Question" />}
+                        {question.isPremium && (
+                          <span title="Premium Question">
+                            <Crown className="h-4 w-4 text-yellow-500" />
+                          </span>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>

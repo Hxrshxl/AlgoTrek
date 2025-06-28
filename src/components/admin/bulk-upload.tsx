@@ -119,13 +119,18 @@ export default function BulkUpload() {
         <div className="space-y-4">
           <div className="flex gap-4">
             <input
-              ref={fileInputRef}
+              ref={(el) => {
+                if (el) {
+                  // @ts-ignore
+                  el.webkitdirectory = true
+                  fileInputRef.current = el
+                }
+              }}
               type="file"
               multiple
               accept=".csv"
               onChange={handleFileSelection}
               className="hidden"
-              webkitdirectory=""
             />
             <Button onClick={handleFolderSelect} variant="outline" className="flex-1 bg-transparent">
               <FolderOpen className="h-4 w-4 mr-2" />

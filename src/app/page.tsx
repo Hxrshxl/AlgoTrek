@@ -48,7 +48,7 @@ const StatCard: React.FC<StatCardProps> = ({ value, description, icon }) => {
 
 // StatsSection Component
 interface StatsSectionProps {
-  statsRef: React.RefObject<HTMLDivElement>
+  statsRef: React.RefObject<HTMLDivElement | null>
 }
 
 const StatsSection: React.FC<StatsSectionProps> = ({ statsRef }) => {
@@ -669,6 +669,14 @@ export default function AlgoTrekLanding() {
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-gray-300">
                 <li>
+                  <a href="#" className="hover:text-algotrek-aqua transition-colors">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-algotrek-aqua transition-colors">
+                    Pricing
+                  </a>
                   <a href="#" className="hover:text-algotrek-aqua transition-colors">
                     Features
                   </a>

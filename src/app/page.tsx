@@ -1,5 +1,3 @@
-
-
 "use client"
 
 import type React from "react"
@@ -67,11 +65,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({ statsRef }) => {
 
   const itemVariants = {
     hidden: { y: 40, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.7, ease: "easeOut" },
-    },
+    visible: { y: 0, opacity: 1 },
   }
 
   return (
@@ -83,13 +77,13 @@ const StatsSection: React.FC<StatsSectionProps> = ({ statsRef }) => {
       viewport={{ once: true, margin: "-100px" }}
       className="grid grid-cols-1 md:grid-cols-3 gap-8"
     >
-      <motion.div variants={itemVariants}>
+      <motion.div variants={itemVariants} transition={{ duration: 0.7, ease: "easeOut" }}>
         <StatCard value="95%" description="Interview Success Rate" icon={<TrendingUp className="w-8 h-8" />} />
       </motion.div>
-      <motion.div variants={itemVariants}>
+      <motion.div variants={itemVariants} transition={{ duration: 0.7, ease: "easeOut" }}>
         <StatCard value="2000+" description="Problems Solved Daily" icon={<BarChart2 className="w-8 h-8" />} />
       </motion.div>
-      <motion.div variants={itemVariants}>
+      <motion.div variants={itemVariants} transition={{ duration: 0.7, ease: "easeOut" }}>
         <StatCard value="85%" description="Land Dream Jobs" icon={<Award className="w-8 h-8" />} />
       </motion.div>
     </motion.div>

@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
     // Process files in batches to avoid overwhelming the system
     const batchSize = 5 // Process 5 files at a time
     const batches = []
-
     for (let i = 0; i < files.length; i += batchSize) {
       batches.push(files.slice(i, i + batchSize))
     }
@@ -137,9 +136,9 @@ async function processSingleFile(file: File): Promise<{
     allowOverwrite: true,
   })
 
-  // Process file content
+  // Process file content - FIXED: Only pass fileContent
   const fileContent = await file.text()
-  const processedData = await processCompanyFile(fileContent, companyName, slug)
+  const processedData = await processCompanyFile(fileContent)
 
   // Store in Supabase
   const { data: company, error: companyError } = await supabaseAdmin

@@ -18,12 +18,9 @@ async function getCompanyData(slug: string) {
       .from("companies")
       .select(`
         *,
-        company_difficulties(*),
-        company_topics(*),
         questions(*)
       `)
       .eq("slug", slug)
-      .eq("is_active", true)
       .single()
 
     if (error) {
@@ -38,43 +35,53 @@ async function getCompanyData(slug: string) {
 
     console.log(`Found company: ${company.name} with ${company.questions?.length || 0} questions`)
 
+    // Calculate difficulties from questions
+    const questions = company.questions || []
+    const difficultyCount: Record<string, number> = {}
+    const topicCount: Record<string, number> = {}
+
+    questions.forEach((q: any) => {
+      // Count difficulties
+      const difficulty = q.difficulty || "Medium"
+      difficultyCount[difficulty] = (difficultyCount[difficulty] || 0) + 1
+
+      // Count topics
+      if (q.topics && Array.isArray(q.topics)) {
+        q.topics.forEach((topic: string) => {
+          topicCount[topic] = (topicCount[topic] || 0) + 1
+        })
+      }
+    })
+
+    const difficulties = Object.entries(difficultyCount).map(([level, count]) => ({
+      level,
+      count,
+    }))
+
+    const topTopics = Object.entries(topicCount)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
+      .map(([topic]) => topic)
+
     return {
       id: company.id,
       name: company.name,
       slug: company.slug,
-      totalQuestions: company.total_questions || 0,
-      category: company.category || "Technology",
+      totalQuestions: company.total_questions || questions.length,
+      category: "Technology", // Default category since it's not in the schema
       lastUpdated: company.last_updated || new Date().toISOString(),
-      difficulties: (company.company_difficulties || []).map((d: { difficulty: string; count: number }) => ({
-        level: d.difficulty,
-        count: d.count,
+      difficulties,
+      topTopics,
+      questions: questions.map((q: any) => ({
+        id: q.question_id || q.id,
+        title: q.title || "Untitled Question",
+        url: q.url || q.leetcode_url || "",
+        isPremium: q.is_premium || false,
+        acceptance: q.acceptance || "N/A",
+        difficulty: q.difficulty || "Medium",
+        frequency: q.frequency || "N/A",
+        topics: q.topics || [],
       })),
-      topTopics: (company.company_topics || [])
-        .sort((a: { rank: number }, b: { rank: number }) => a.rank - b.rank)
-        .slice(0, 10)
-        .map((t: { topic: string }) => t.topic),
-      questions: (company.questions || []).map(
-        (q: {
-          question_id?: string
-          id: string
-          title?: string
-          url?: string
-          is_premium?: boolean
-          acceptance?: string
-          difficulty?: string
-          frequency?: string
-          topics?: string[]
-        }) => ({
-          id: q.question_id || q.id,
-          title: q.title || "Untitled Question",
-          url: q.url || "",
-          isPremium: q.is_premium || false,
-          acceptance: q.acceptance || "N/A",
-          difficulty: q.difficulty || "Medium",
-          frequency: q.frequency || "N/A",
-          topics: q.topics || [],
-        }),
-      ),
     }
   } catch (error) {
     console.error("Error in getCompanyData:", error)

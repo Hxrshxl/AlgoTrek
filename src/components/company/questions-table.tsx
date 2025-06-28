@@ -201,7 +201,7 @@ export default function QuestionsTable({ questions = [], companySlug }: Question
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredQuestions.map((question, index) => {
+              {filteredQuestions.map((question) => {
                 const isCompleted = completedQuestions.has(question.id)
                 const questionTopics = question.topics || []
 

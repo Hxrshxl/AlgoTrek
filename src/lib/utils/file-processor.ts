@@ -9,8 +9,8 @@ interface ProcessedCompanyData {
 
 export async function processCompanyFile(
   csvContent: string,
-  companyName: string,
-  slug: string,
+  _companyName: string, // unused for now, prefixed to avoid ESLint error
+  _slug: string         // unused for now, prefixed to avoid ESLint error
 ): Promise<ProcessedCompanyData> {
   const questions = parseCSV(csvContent)
 

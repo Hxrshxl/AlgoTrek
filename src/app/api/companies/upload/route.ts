@@ -31,9 +31,9 @@ export async function POST(request: NextRequest) {
 
     console.log("File uploaded to blob:", blob.url)
 
-    // Process the file and extract data
+    // Process the file and extract data - FIXED: Only pass fileContent
     const fileContent = await file.text()
-    const processedData = await processCompanyFile(fileContent, companyName, slug)
+    const processedData = await processCompanyFile(fileContent)
 
     console.log("Processed data:", {
       totalQuestions: processedData.totalQuestions,

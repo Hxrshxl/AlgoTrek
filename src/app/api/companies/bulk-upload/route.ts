@@ -14,20 +14,24 @@ export async function POST(request: NextRequest) {
 
     console.log(`Starting bulk upload of ${files.length} files`)
 
+    interface SuccessResult {
+      success: true
+      fileName: string
+      companyName: string
+      slug: string
+      totalQuestions: number
+      blobUrl: string
+    }
+
+    interface FailureResult {
+      success: false
+      fileName: string
+      error: string
+    }
+
     interface UploadResult {
-      successful: Array<{
-        success: boolean
-        fileName: string
-        companyName: string
-        slug: string
-        totalQuestions: number
-        blobUrl: string
-      }>
-      failed: Array<{
-        success: boolean
-        fileName: string
-        error: string
-      }>
+      successful: SuccessResult[]
+      failed: FailureResult[]
       total: number
     }
 
@@ -52,7 +56,7 @@ export async function POST(request: NextRequest) {
       console.log(`Processing batch ${batchIndex + 1}/${batches.length}`)
 
       // Process batch in parallel
-      const batchPromises = batch.map(async (file) => {
+      const batchPromises = batch.map(async (file): Promise<SuccessResult | FailureResult> => {
         try {
           return await processSingleFile(file)
         } catch (error) {
@@ -100,7 +104,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function processSingleFile(file: File) {
+async function processSingleFile(file: File): Promise<{
+  success: true
+  fileName: string
+  companyName: string
+  slug: string
+  totalQuestions: number
+  blobUrl: string
+}> {
   // Extract just the filename without path and extension
   const fileName = file.name.split("/").pop() || file.name // Remove path if present
   const baseFileName = fileName.replace(/\.csv$/i, "") // Remove .csv extension

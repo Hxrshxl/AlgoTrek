@@ -239,8 +239,8 @@ export default function QuestionsTable({ questions = [], companySlug }: Question
                     <TableCell className="text-sm text-gray-600">{question.acceptance || "N/A"}</TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {questionTopics.slice(0, 2).map((topic, topicIndex) => (
-                          <Badge key={`${topic}-${topicIndex}`} variant="secondary" className="text-xs">
+                        {questionTopics.slice(0, 2).map((topic) => (
+                          <Badge key={topic} variant="secondary" className="text-xs">
                             {topic}
                           </Badge>
                         ))}

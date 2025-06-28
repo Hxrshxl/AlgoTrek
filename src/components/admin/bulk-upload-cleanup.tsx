@@ -36,7 +36,7 @@ export default function BulkUploadCleanup() {
           message: data.error || "Cleanup failed",
         })
       }
-    } catch (error) {
+    } catch {
       setResult({
         success: false,
         message: "Network error occurred during cleanup",
@@ -51,8 +51,8 @@ export default function BulkUploadCleanup() {
       <Alert className="border-yellow-200 bg-yellow-50">
         <AlertTriangle className="h-4 w-4 text-yellow-600" />
         <AlertDescription className="text-yellow-800">
-          <strong>Warning:</strong> This will permanently delete all companies that have names starting with "Data/".
-          Make sure you want to proceed before clicking cleanup.
+          <strong>Warning:</strong> This will permanently delete all companies that have names starting with {'"Data/"'}
+          . Make sure you want to proceed before clicking cleanup.
         </AlertDescription>
       </Alert>
 

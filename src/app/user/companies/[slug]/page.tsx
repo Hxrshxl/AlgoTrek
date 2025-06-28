@@ -45,24 +45,36 @@ async function getCompanyData(slug: string) {
       totalQuestions: company.total_questions || 0,
       category: company.category || "Technology",
       lastUpdated: company.last_updated || new Date().toISOString(),
-      difficulties: (company.company_difficulties || []).map((d: any) => ({
+      difficulties: (company.company_difficulties || []).map((d: { difficulty: string; count: number }) => ({
         level: d.difficulty,
         count: d.count,
       })),
       topTopics: (company.company_topics || [])
-        .sort((a: any, b: any) => a.rank - b.rank)
+        .sort((a: { rank: number }, b: { rank: number }) => a.rank - b.rank)
         .slice(0, 10)
-        .map((t: any) => t.topic),
-      questions: (company.questions || []).map((q: any) => ({
-        id: q.question_id || q.id,
-        title: q.title || "Untitled Question",
-        url: q.url || "",
-        isPremium: q.is_premium || false,
-        acceptance: q.acceptance || "N/A",
-        difficulty: q.difficulty || "Medium",
-        frequency: q.frequency || "N/A",
-        topics: q.topics || [],
-      })),
+        .map((t: { topic: string }) => t.topic),
+      questions: (company.questions || []).map(
+        (q: {
+          question_id?: string
+          id: string
+          title?: string
+          url?: string
+          is_premium?: boolean
+          acceptance?: string
+          difficulty?: string
+          frequency?: string
+          topics?: string[]
+        }) => ({
+          id: q.question_id || q.id,
+          title: q.title || "Untitled Question",
+          url: q.url || "",
+          isPremium: q.is_premium || false,
+          acceptance: q.acceptance || "N/A",
+          difficulty: q.difficulty || "Medium",
+          frequency: q.frequency || "N/A",
+          topics: q.topics || [],
+        }),
+      ),
     }
   } catch (error) {
     console.error("Error in getCompanyData:", error)

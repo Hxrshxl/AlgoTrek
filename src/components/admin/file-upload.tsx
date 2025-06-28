@@ -16,7 +16,11 @@ export default function FileUpload() {
   const [result, setResult] = useState<{
     success: boolean
     message: string
-    data?: any
+    data?: {
+      totalQuestions: number
+      difficulties: Array<{ level: string; count: number }>
+      topTopics: Array<{ name: string }>
+    }
     details?: string
   } | null>(null)
 
@@ -137,12 +141,17 @@ export default function FileUpload() {
               {result.message}
               {result.success && result.data && (
                 <div className="mt-2 text-sm">
-                  <p>Difficulties: {result.data.difficulties.map((d: any) => `${d.level} (${d.count})`).join(", ")}</p>
+                  <p>
+                    Difficulties:{" "}
+                    {result.data.difficulties
+                      .map((d: { level: string; count: number }) => `${d.level} (${d.count})`)
+                      .join(", ")}
+                  </p>
                   <p>
                     Top Topics:{" "}
                     {result.data.topTopics
                       .slice(0, 3)
-                      .map((t: any) => t.name)
+                      .map((t: { name: string }) => t.name)
                       .join(", ")}
                   </p>
                 </div>

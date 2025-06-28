@@ -9,8 +9,15 @@ import { Upload, FolderOpen, CheckCircle, AlertCircle, Loader2, FileText } from 
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface UploadResult {
-  successful: any[]
-  failed: any[]
+  successful: Array<{
+    fileName: string
+    companyName: string
+    totalQuestions: number
+  }>
+  failed: Array<{
+    fileName: string
+    error: string
+  }>
   total: number
 }
 
@@ -83,7 +90,7 @@ export default function BulkUpload() {
           message: data.error || "Bulk upload failed",
         })
       }
-    } catch (error) {
+    } catch {
       setResult({
         success: false,
         message: "Network error occurred during bulk upload",
@@ -228,7 +235,7 @@ export default function BulkUpload() {
                       <details className="mt-2">
                         <summary className="cursor-pointer font-medium">View Failed Files</summary>
                         <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
-                          {result.results.failed.map((failure: any, index: number) => (
+                          {result.results.failed.map((failure: { fileName: string; error: string }, index: number) => (
                             <div key={index} className="text-xs bg-red-100 p-2 rounded">
                               <strong>{failure.fileName}:</strong> {failure.error}
                             </div>
@@ -241,11 +248,13 @@ export default function BulkUpload() {
                       <details className="mt-2">
                         <summary className="cursor-pointer font-medium">View Successful Uploads</summary>
                         <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
-                          {result.results.successful.slice(0, 10).map((success: any, index: number) => (
-                            <div key={index} className="text-xs bg-green-100 p-2 rounded">
-                              <strong>{success.companyName}:</strong> {success.totalQuestions} questions
-                            </div>
-                          ))}
+                          {result.results.successful
+                            .slice(0, 10)
+                            .map((success: { companyName: string; totalQuestions: number }, index: number) => (
+                              <div key={index} className="text-xs bg-green-100 p-2 rounded">
+                                <strong>{success.companyName}:</strong> {success.totalQuestions} questions
+                              </div>
+                            ))}
                           {result.results.successful.length > 10 && (
                             <div className="text-xs text-center py-1">
                               ... and {result.results.successful.length - 10} more

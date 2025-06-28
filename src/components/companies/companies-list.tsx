@@ -10,7 +10,7 @@ export default function CompaniesList() {
   const [companies, setCompanies] = useState<CompanyData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm] = useState("")
 
   useEffect(() => {
     async function loadCompanies() {

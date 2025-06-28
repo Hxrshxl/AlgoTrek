@@ -18,7 +18,7 @@ export async function GET() {
     }
 
     // Test table structure
-    const { data: tableInfo, error: tableError } = await supabaseAdmin.from("companies").select("*").limit(1)
+    const { data: tableInfo } = await supabaseAdmin.from("companies").select("*").limit(1)
 
     console.log("Database test successful")
 

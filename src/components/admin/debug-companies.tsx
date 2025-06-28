@@ -8,7 +8,19 @@ import { Badge } from "@/components/ui/badge"
 
 export default function DebugCompanies() {
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<{
+    success: boolean
+    error?: string
+    count: number
+    companies: Array<{
+      id: string
+      name: string
+      slug: string
+      total_questions: number
+      is_active: boolean
+    }>
+    message?: string
+  } | null>(null)
 
   const debugCompanies = async () => {
     setLoading(true)
@@ -18,7 +30,7 @@ export default function DebugCompanies() {
       const response = await fetch("/api/companies/debug")
       const data = await response.json()
       setResult(data)
-    } catch (error) {
+    } catch {
       setResult({
         success: false,
         error: "Network error occurred",
@@ -59,31 +71,39 @@ export default function DebugCompanies() {
                 <div className="space-y-3">
                   <p className="font-medium text-sm">Companies in Database:</p>
                   <div className="grid gap-3 max-h-60 overflow-y-auto">
-                    {result.companies.map((company: any) => (
-                      <div key={company.id} className="bg-white p-3 rounded-lg border text-sm">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium">{company.name}</h4>
-                          <Badge variant={company.is_active ? "default" : "secondary"}>
-                            {company.is_active ? "Active" : "Inactive"}
-                          </Badge>
+                    {result.companies.map(
+                      (company: {
+                        id: string
+                        name: string
+                        slug: string
+                        total_questions: number
+                        is_active: boolean
+                      }) => (
+                        <div key={company.id} className="bg-white p-3 rounded-lg border text-sm">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-medium">{company.name}</h4>
+                            <Badge variant={company.is_active ? "default" : "secondary"}>
+                              {company.is_active ? "Active" : "Inactive"}
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-2">
+                            <div>Slug: {company.slug}</div>
+                            <div>Questions: {company.total_questions}</div>
+                          </div>
+                          <Button asChild size="sm" variant="outline" className="w-full bg-transparent">
+                            <a
+                              href={`/user/companies/${company.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              Test Company Page
+                            </a>
+                          </Button>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-2">
-                          <div>Slug: {company.slug}</div>
-                          <div>Questions: {company.total_questions}</div>
-                        </div>
-                        <Button asChild size="sm" variant="outline" className="w-full bg-transparent">
-                          <a
-                            href={`/user/companies/${company.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Test Company Page
-                          </a>
-                        </Button>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </div>
               )}

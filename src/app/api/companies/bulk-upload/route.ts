@@ -14,9 +14,26 @@ export async function POST(request: NextRequest) {
 
     console.log(`Starting bulk upload of ${files.length} files`)
 
-    const results = {
-      successful: [] as any[],
-      failed: [] as any[],
+    interface UploadResult {
+      successful: Array<{
+        success: boolean
+        fileName: string
+        companyName: string
+        slug: string
+        totalQuestions: number
+        blobUrl: string
+      }>
+      failed: Array<{
+        success: boolean
+        fileName: string
+        error: string
+      }>
+      total: number
+    }
+
+    const results: UploadResult = {
+      successful: [],
+      failed: [],
       total: files.length,
     }
 

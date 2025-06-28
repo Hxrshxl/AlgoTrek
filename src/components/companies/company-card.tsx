@@ -1,16 +1,28 @@
-import Link from "next/link"
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Building2, FileText, TrendingUp } from "lucide-react"
 import type { CompanyData } from "@/lib/types/company"
+import HamsterLoader from "@/components/ui/hamster-loader"
 
 interface CompanyCardProps {
   company: CompanyData
 }
 
 export default function CompanyCard({ company }: CompanyCardProps) {
-  if (!company) {
-    return null
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+
+  const handleClick = async () => {
+    setIsLoading(true)
+
+    // Add a small delay to ensure the loader shows
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    router.push(`/user/companies/${company.slug}`)
   }
 
   const getDifficultyColor = (difficulty: string) => {
@@ -37,8 +49,12 @@ export default function CompanyCard({ company }: CompanyCardProps) {
   const totalQuestions = company.totalQuestions || 0
 
   return (
-    <Link href={`/user/companies/${company.slug}`}>
-      <Card className="h-full hover:shadow-lg transition-all duration-200 hover:border-teal-200 group cursor-pointer">
+    <>
+      {isLoading && <HamsterLoader />}
+      <Card
+        className="h-full hover:shadow-lg transition-all duration-200 hover:border-teal-200 group cursor-pointer"
+        onClick={handleClick}
+      >
         <CardContent className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -87,6 +103,6 @@ export default function CompanyCard({ company }: CompanyCardProps) {
           </div>
         </CardContent>
       </Card>
-    </Link>
+    </>
   )
 }

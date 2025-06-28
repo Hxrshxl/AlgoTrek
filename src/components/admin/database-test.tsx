@@ -7,7 +7,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function DatabaseTest() {
   const [testing, setTesting] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<{
+    success: boolean
+    error?: string
+    tablesExist?: boolean
+    companyCount?: number
+  } | null>(null)
 
   const testConnection = async () => {
     setTesting(true)
@@ -17,7 +22,7 @@ export default function DatabaseTest() {
       const response = await fetch("/api/test-db")
       const data = await response.json()
       setResult(data)
-    } catch (error) {
+    } catch {
       setResult({
         success: false,
         error: "Network error occurred",

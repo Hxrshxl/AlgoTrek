@@ -9,18 +9,27 @@ export interface Database {
           name: string
           slug: string
           total_questions: number | null
+          blob_url?: string | null
+          file_name?: string | null
+          last_updated?: string | null
         }
         Insert: {
           id?: string
           name: string
           slug: string
           total_questions?: number | null
+          blob_url?: string | null
+          file_name?: string | null
+          last_updated?: string | null
         }
         Update: {
           id?: string
           name?: string
           slug?: string
           total_questions?: number | null
+          blob_url?: string | null
+          file_name?: string | null
+          last_updated?: string | null
         }
         Relationships: []
       }
@@ -32,6 +41,11 @@ export interface Database {
           leetcode_url: string | null
           title: string | null
           topics: string[] | null
+          question_id?: string | null
+          url?: string | null
+          is_premium?: boolean | null
+          acceptance?: string | null
+          frequency?: number | null
         }
         Insert: {
           company_id: string
@@ -40,6 +54,11 @@ export interface Database {
           leetcode_url?: string | null
           title?: string | null
           topics?: string[] | null
+          question_id?: string | null
+          url?: string | null
+          is_premium?: boolean | null
+          acceptance?: string | null
+          frequency?: number | null
         }
         Update: {
           company_id?: string
@@ -48,6 +67,11 @@ export interface Database {
           leetcode_url?: string | null
           title?: string | null
           topics?: string[] | null
+          question_id?: string | null
+          url?: string | null
+          is_premium?: boolean | null
+          acceptance?: string | null
+          frequency?: number | null
         }
         Relationships: [
           {

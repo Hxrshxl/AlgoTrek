@@ -1,113 +1,97 @@
-import type { QuestionData, DifficultyCount } from "@/lib/types/company"
-
-interface ProcessedCompanyData {
-  totalQuestions: number
-  difficulties: DifficultyCount[]
-  topTopics: { name: string; count: number }[]
-  questions: QuestionData[]
+export interface ProcessedQuestion {
+  id: string
+  title: string
+  url?: string
+  leetcode_url?: string
+  isPremium?: boolean
+  acceptance?: string
+  difficulty: string
+  frequency?: number
+  topics: string[]
 }
 
-export async function processCompanyFile(csvContent: string): Promise<ProcessedCompanyData> {
-  const questions = parseCSV(csvContent)
+export interface ProcessedCompanyData {
+  questions: ProcessedQuestion[]
+  totalQuestions: number
+  difficulties: Array<{ level: string; count: number }>
+  topTopics: Array<{ name: string; count: number }>
+}
 
-  const difficulties: DifficultyCount[] = [
-    { level: "Easy", count: 0 },
-    { level: "Medium", count: 0 },
-    { level: "Hard", count: 0 },
-  ]
+export async function processCompanyFile(fileContent: string): Promise<ProcessedCompanyData> {
+  const lines = fileContent.split("\n").filter((line) => line.trim())
+  const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""))
 
-  const topicCounts: Record<string, number> = {}
+  const questions: ProcessedQuestion[] = []
+  const difficultyCount: Record<string, number> = {}
+  const topicCount: Record<string, number> = {}
 
-  questions.forEach((question) => {
-    // Count difficulties
-    const diffIndex = difficulties.findIndex((d) => d.level === question.difficulty)
-    if (diffIndex !== -1) {
-      difficulties[diffIndex].count++
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(",").map((v) => v.trim().replace(/"/g, ""))
+
+    if (values.length < headers.length) continue
+
+    const question: ProcessedQuestion = {
+      id: values[headers.indexOf("ID")] || `q-${i}`,
+      title: values[headers.indexOf("Title")] || values[headers.indexOf("Question")] || `Question ${i}`,
+      difficulty: values[headers.indexOf("Difficulty")] || "Medium",
+      topics: [],
     }
+
+    // Handle URL
+    const urlIndex = headers.findIndex((h) => h.toLowerCase().includes("url") || h.toLowerCase().includes("link"))
+    if (urlIndex >= 0) {
+      question.url = values[urlIndex]
+      question.leetcode_url = values[urlIndex]
+    }
+
+    // Handle acceptance
+    const acceptanceIndex = headers.findIndex((h) => h.toLowerCase().includes("acceptance"))
+    if (acceptanceIndex >= 0) {
+      question.acceptance = values[acceptanceIndex]
+    }
+
+    // Handle premium
+    const premiumIndex = headers.findIndex((h) => h.toLowerCase().includes("premium"))
+    if (premiumIndex >= 0) {
+      question.isPremium = values[premiumIndex]?.toLowerCase() === "true"
+    }
+
+    // Handle frequency
+    const frequencyIndex = headers.findIndex((h) => h.toLowerCase().includes("frequency"))
+    if (frequencyIndex >= 0) {
+      question.frequency = Number.parseInt(values[frequencyIndex]) || 0
+    }
+
+    // Handle topics
+    const topicsIndex = headers.findIndex((h) => h.toLowerCase().includes("topic"))
+    if (topicsIndex >= 0 && values[topicsIndex]) {
+      question.topics = values[topicsIndex]
+        .split(";")
+        .map((t) => t.trim())
+        .filter((t) => t)
+    }
+
+    questions.push(question)
+
+    // Count difficulties
+    difficultyCount[question.difficulty] = (difficultyCount[question.difficulty] || 0) + 1
 
     // Count topics
     question.topics.forEach((topic) => {
-      if (topic.trim()) {
-        topicCounts[topic.trim()] = (topicCounts[topic.trim()] || 0) + 1
-      }
+      topicCount[topic] = (topicCount[topic] || 0) + 1
     })
-  })
+  }
 
-  // Get top topics with counts
-  const topTopics = Object.entries(topicCounts)
+  const difficulties = Object.entries(difficultyCount).map(([level, count]) => ({ level, count }))
+  const topTopics = Object.entries(topicCount)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 10)
     .map(([name, count]) => ({ name, count }))
 
   return {
-    totalQuestions: questions.length,
-    difficulties: difficulties.filter((d) => d.count > 0),
-    topTopics,
     questions,
+    totalQuestions: questions.length,
+    difficulties,
+    topTopics,
   }
-}
-
-function parseCSV(csvText: string): QuestionData[] {
-  const lines = csvText.split("\n")
-  if (lines.length < 2) return []
-
-  const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""))
-  const questions: QuestionData[] = []
-
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim()
-    if (!line) continue
-
-    const values = parseCSVLine(line)
-    if (values.length < headers.length) continue
-
-    try {
-      const question: QuestionData = {
-        id: values[0]?.replace(/"/g, "") || "",
-        title: values[1]?.replace(/"/g, "") || "",
-        url: values[2]?.replace(/"/g, "") || "",
-        isPremium: values[3]?.replace(/"/g, "") === "Y",
-        acceptance: values[4]?.replace(/"/g, "") || "",
-        difficulty: (values[5]?.replace(/"/g, "") as "Easy" | "Medium" | "Hard") || "Medium",
-        frequency: values[6]?.replace(/"/g, "") || "",
-        topics: values[7]
-          ? values[7]
-              .replace(/"/g, "")
-              .split(",")
-              .map((t) => t.trim())
-              .filter(Boolean)
-          : [],
-      }
-
-      if (question.title) {
-        questions.push(question)
-      }
-    } catch (error) {
-      console.error(`Error parsing line ${i}:`, error)
-    }
-  }
-
-  return questions
-}
-
-function parseCSVLine(line: string): string[] {
-  const result: string[] = []
-  let current = ""
-  let inQuotes = false
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i]
-
-    if (char === '"') {
-      inQuotes = !inQuotes
-    } else if (char === "," && !inQuotes) {
-      result.push(current.trim())
-      current = ""
-    } else {
-      current += char
-    }
-  }
-
-  result.push(current.trim())
-  return result
 }

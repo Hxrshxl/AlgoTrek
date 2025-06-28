@@ -136,7 +136,7 @@ async function processSingleFile(file: File): Promise<{
     allowOverwrite: true,
   })
 
-  // Process file content - FIXED: Only pass fileContent
+  // Process file content
   const fileContent = await file.text()
   const processedData = await processCompanyFile(fileContent)
 
@@ -158,47 +158,22 @@ async function processSingleFile(file: File): Promise<{
     throw new Error(`Failed to save company ${companyName}: ${JSON.stringify(companyError)}`)
   }
 
-  // Clear existing related data
-  await Promise.all([
-    supabaseAdmin.from("company_difficulties").delete().eq("company_id", company.id),
-    supabaseAdmin.from("company_topics").delete().eq("company_id", company.id),
-    supabaseAdmin.from("questions").delete().eq("company_id", company.id),
-  ])
-
-  // Store difficulties
-  if (processedData.difficulties.length > 0) {
-    await supabaseAdmin.from("company_difficulties").insert(
-      processedData.difficulties.map((diff) => ({
-        company_id: company.id,
-        difficulty: diff.level,
-        count: diff.count,
-      })),
-    )
-  }
-
-  // Store topics
-  if (processedData.topTopics.length > 0) {
-    await supabaseAdmin.from("company_topics").insert(
-      processedData.topTopics.map((topic, index) => ({
-        company_id: company.id,
-        topic: topic.name,
-        count: topic.count,
-        rank: index + 1,
-      })),
-    )
-  }
+  // Clear existing questions for this company
+  await supabaseAdmin.from("questions").delete().eq("company_id", company.id)
 
   // Store questions in smaller batches
   if (processedData.questions.length > 0) {
     const questionBatchSize = 50
     for (let i = 0; i < processedData.questions.length; i += questionBatchSize) {
       const questionBatch = processedData.questions.slice(i, i + questionBatchSize)
-      await supabaseAdmin.from("questions").insert(
+
+      const { error: questionsError } = await supabaseAdmin.from("questions").insert(
         questionBatch.map((q) => ({
           company_id: company.id,
           question_id: q.id,
           title: q.title,
-          url: q.url,
+          url: q.url || q.leetcode_url,
+          leetcode_url: q.url || q.leetcode_url,
           is_premium: q.isPremium,
           acceptance: q.acceptance,
           difficulty: q.difficulty,
@@ -206,6 +181,11 @@ async function processSingleFile(file: File): Promise<{
           topics: q.topics,
         })),
       )
+
+      if (questionsError) {
+        console.error(`Error inserting questions batch:`, questionsError)
+        throw new Error(`Failed to insert questions: ${JSON.stringify(questionsError)}`)
+      }
     }
   }
 
